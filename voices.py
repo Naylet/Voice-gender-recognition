@@ -26,7 +26,7 @@ def open(file):
 
 if __name__ == "__main__":
     if len(sys.argv) == 2:
-        open("train1/" + sys.argv[1])
+        open("train/" + sys.argv[1])
     else:
         filenames = os.listdir('train')
 
