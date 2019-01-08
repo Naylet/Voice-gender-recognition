@@ -1,37 +1,72 @@
 # Harmonic Product Spectrum Algorithm
 
-#fft - decimate(2:6)-fundamental
-
 from matplotlib import pylab as plt
-import numpy as np
+from scipy.signal import decimate
 from scipy.io import wavfile
-import soundfile
+from copy import copy
+import numpy as np
+import warnings
 import sys
 import os
+import re
 
 
-def open(file):
-    print("opening " + file)
+def analyze(file):
+    print(file)
 
     try:
-        signal, sample_rate = soundfile.read(file)
+        sampling_frequency, data = wavfile.read(file)
     except ValueError:
         print("unable to read " + file)
         print("")
     else:
-        print(sample_rate)
-        plt.plot(signal)
-        plt.show()
+        if not isinstance(data[0], np.int16):
+            data = data[:, 0]
+
+        samples_count = len(data)
+        audio_duration = samples_count / sampling_frequency
+
+        data = data * np.hamming(samples_count)
+        spectrum = abs(np.fft.rfft(data))
+        hps = copy(spectrum)
+
+        for q in range(2, 6):
+            decimated_spectrum = decimate(spectrum, q)
+            hps[:len(decimated_spectrum)] += decimated_spectrum
+
+        peak_start = int(50 * audio_duration)
+        peak = np.argmax(hps[peak_start:])
+        fundamental = (peak_start + peak) / audio_duration
+
+        #print(fundamental)
+
+        if fundamental < 165:
+            return 'M'
+        else:
+            return 'K'
 
 
 if __name__ == "__main__":
+    warnings.filterwarnings('ignore')
+
     if len(sys.argv) == 2:
-        open("train1/" + sys.argv[1])
+        result = analyze("train/" + sys.argv[1])
+        print(result)
+        correct = re.search('([KM]).wav', sys.argv[1]).group(1)
+
     else:
+        count_correct = 0
         filenames = os.listdir('train')
 
-        file_number = len(filenames)
-        checked_positive = 0
-
         for filename in filenames:
-            open('train/' + filename)
+            result = analyze('train/' + filename)
+            print(result)
+
+            correct = re.search('([KM]).wav', filename).group(1)
+
+            if correct == result:
+                count_correct += 1
+
+            print("")
+
+        print("Skuteczność: %.2f%%" % (count_correct / len(filenames) * 100))
