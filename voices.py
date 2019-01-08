@@ -15,19 +15,19 @@ def analyze(file):
     print(file)
 
     try:
-        sampling_frequency, data = wavfile.read(file)
+        sampling_frequency, signal = wavfile.read(file)
     except ValueError:
         print("unable to read " + file)
         print("")
     else:
-        if not isinstance(data[0], np.int16):
-            data = data[:, 0]
+        if not isinstance(signal[0], np.int16):
+            signal = signal[:, 0]
 
-        samples_count = len(data)
+        samples_count = len(signal)
         audio_duration = samples_count / sampling_frequency
 
-        data = data * np.hamming(samples_count)
-        spectrum = abs(np.fft.rfft(data))
+        signal = signal * np.hamming(samples_count)
+        spectrum = abs(np.fft.rfft(signal))
         hps = copy(spectrum)
 
         for q in range(2, 6):
