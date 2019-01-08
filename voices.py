@@ -4,6 +4,7 @@ from matplotlib import pylab as plt
 from scipy.signal import decimate
 from scipy.io import wavfile
 from copy import copy
+import soundfile
 import numpy as np
 import warnings
 import sys
@@ -15,12 +16,12 @@ def analyze(file):
     print(file)
 
     try:
-        sampling_frequency, signal = wavfile.read(file)
+        signal, sampling_frequency = soundfile.read(file)
     except ValueError:
         print("unable to read " + file)
         print("")
     else:
-        if not isinstance(signal[0], np.int16):
+        if not isinstance(signal[0], np.float64):
             signal = signal[:, 0]
 
         samples_count = len(signal)
