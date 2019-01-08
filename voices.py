@@ -2,7 +2,6 @@
 
 from matplotlib import pylab as plt
 from scipy.signal import decimate
-from scipy.io import wavfile
 from copy import copy
 import soundfile
 import numpy as np
