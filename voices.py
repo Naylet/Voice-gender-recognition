@@ -53,7 +53,6 @@ if __name__ == "__main__":
         result = analyze("train/" + sys.argv[1])
         print(result)
         correct = re.search('([KM]).wav', sys.argv[1]).group(1)
-
     else:
         count_correct = 0
         filenames = os.listdir('train')
